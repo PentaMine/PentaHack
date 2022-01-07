@@ -8,6 +8,7 @@ public abstract class Command {
 
     public String name, description, syntax;
     public List<String> alaises = new ArrayList<String>();
+    public List<String> aliases = new ArrayList<String>();
 
     public Command(String name, String description, String syntax, String... aliases ) {
         this.name = name;
