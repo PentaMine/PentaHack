@@ -1,9 +1,10 @@
 package net.minecraft.pentahack.modules.combat;
 
 import net.minecraft.pentahack.events.Event;
-import net.minecraft.pentahack.events.listeners.EventPosition;
+import net.minecraft.pentahack.events.listeners.EventMotion;
 import net.minecraft.pentahack.modules.Module;
 import net.minecraft.pentahack.settings.BooleanSetting;
+import net.minecraft.pentahack.settings.ModeSetting;
 import net.minecraft.pentahack.settings.NumberSetting;
 import net.minecraft.pentahack.util.Timer;
 import net.minecraft.client.Minecraft;
@@ -20,34 +21,35 @@ public class KillAuraModule extends Module {
     public Timer timer = new Timer();
 
 
-    public BooleanSetting clientAim = new BooleanSetting("ClientAim", false);
+    //public BooleanSetting clientAim = new BooleanSetting("ClientAim", false);
+    public ModeSetting aim = new ModeSetting("aim", "Packet", "Packet", "Client", "None");
     public BooleanSetting noSwing = new BooleanSetting("NoSwing", false);
     public NumberSetting range = new NumberSetting("Range", 4, 1, 6);
-    public NumberSetting offset = new NumberSetting("Offset %", 0, 0, 20);
-
-    public BooleanSetting hidden = new BooleanSetting("Hidden", false);
+    public BooleanSetting multiShot = new BooleanSetting("MultiShot", false);
 
     public KillAuraModule() {
-        super("KillAura", Keyboard.KEY_R, Category.COMBAT);
-        this.addSettings(clientAim, noSwing, range, hidden);
+        super("KillAura", Keyboard.KEY_NONE, Category.COMBAT);
+        this.addSettings(aim, noSwing, range, multiShot);
     }
 
-
+    @Override
     public void onEnable() {
 
     }
 
+    @Override
     public void onDisable() {
 
     }
 
+    @Override
     public void onEvent(Event e) {
 
-        if (e instanceof EventPosition) {
+        if (e instanceof EventMotion) {
             if (e.isPre()) {
 
 
-                EventPosition event = (EventPosition) e;
+                EventMotion event = (EventMotion) e;
 
                 //sort entities by range, type and distance
                 List<EntityLivingBase> targets = (List) mc.world.loadedEntityList.stream().filter(EntityLivingBase.class::isInstance).collect(Collectors.toList());
@@ -62,32 +64,37 @@ public class KillAuraModule extends Module {
                 //use code above for filtering entities
 
                 if (!targets.isEmpty()) {
-                    float yaw = AimBotModule.rotations(targets.get(0))[0];
-                    float pitch = AimBotModule.rotations(targets.get(0))[1];
-
-                    yaw += (yaw / 100) * offset.getValue();
-                    pitch += (pitch / 100) * offset.getValue();
 
                     EntityLivingBase target = targets.get(0);
-                    if (clientAim.isEnabled()) {
 
-                        mc.player.rotationYaw = yaw;
-                        mc.player.rotationPitch = pitch;
-
-
+                    if (aim.getMode().equalsIgnoreCase("client")) {
+                        AimBotModule.faceEntity(target);
                     }
+                    if (aim.getMode().equalsIgnoreCase("packet")) {
+                        float[] rotations = AimBotModule.getRotationsNeeded(target);
 
-                    event.setYaw(yaw);
-                    event.setPitch(pitch);
+                        if (rotations != null) {
+                            event.setYaw(rotations[0]);
+                            event.setPitch(rotations[1]);
+                        }
+                    }
 
                     if (mc.player.getCooledAttackStrength(0.000000001f) == 1) {
                         //hitting the entity
+                        if (multiShot.isEnabled()) {
 
-                        mc.playerController.attackEntity(mc.player, target);
-                        if (!noSwing.isEnabled()) {
-                            mc.player.swingArm(EnumHand.MAIN_HAND);
+                            for (EntityLivingBase entity : targets) {
+                                mc.player.setCooldown(9999999);
+                                mc.playerController.attackEntity(mc.player, entity);
+                            }
+                        } else {
+                            mc.playerController.attackEntity(mc.player, target);
+
+                            if (!noSwing.isEnabled()) {
+                                mc.player.swingArm(EnumHand.MAIN_HAND);
+                            }
+                            mc.player.resetCooldown();
                         }
-                        mc.player.resetCooldown();
                     }
                 }
             }

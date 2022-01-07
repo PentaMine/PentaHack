@@ -8,10 +8,8 @@ import org.lwjgl.input.Keyboard;
 
 public class SprintModule extends Module {
 
-    public BooleanSetting hidden = new BooleanSetting("Hidden", false);
     public SprintModule() {
-        super("Sprint", Keyboard.KEY_N, Category.MOVEMENT);
-        this.addSettings(hidden);
+        super("Sprint", Keyboard.KEY_NONE, Category.MOVEMENT);
     }
 
     public void onEnable() {
@@ -25,7 +23,6 @@ public class SprintModule extends Module {
     public void onEvent(Event e) {
         if (e instanceof EventUpdate) {
             if (e.isPre()) {
-
                 if (Keyboard.isKeyDown(17) && !mc.player.isSneaking() && !mc.player.isCollidedHorizontally) {
                     mc.player.setSprinting(true);
 

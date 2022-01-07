@@ -1,16 +1,19 @@
 package net.minecraft.pentahack.modules;
 
+import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
+import net.minecraft.pentahack.Client;
 import net.minecraft.pentahack.events.Event;
 import net.minecraft.pentahack.settings.Setting;
 import net.minecraft.client.Minecraft;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Module {
 
-    public String name;
+    public String name, description;
     public boolean toggled;
     public int keyCode;
     public Category category;
@@ -24,6 +27,14 @@ public class Module {
         this.name = name;
         this.keyCode = key;
         this.category = c;
+        this.description = "A module (This is a placeholder)";
+    }
+
+    public Module(String name, int key, Category c, String description) {
+        this.name = name;
+        this.keyCode = key;
+        this.category = c;
+        this.description = description;
     }
 
     public void addSettings(Setting... settings) {
@@ -43,8 +54,8 @@ public class Module {
     }
 
     public void toggle() {
-        toggled = !toggled;
-        if (toggled) {
+        this.toggled = !this.toggled;
+        if (this.toggled) {
             onEnable();
         } else {
             onDisable();
@@ -80,6 +91,24 @@ public class Module {
             this.x = x;
             this.y = y;
             this.expanded = expanded;
+        }
+
+        public static List<Module> getModulesByCategory(String name) {
+
+            name = name.toLowerCase();
+            name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+
+            List<Module> modules = new ArrayList<>(Collections.emptyList());
+            for (Category c : Module.Category.values()) {
+                if (c.name.equals(name)) {
+                    for (Module m : Client.modules) {
+                        if (m.category == c) {
+                            modules.add(m);
+                        }
+                    }
+                }
+            }
+            return modules;
         }
     }
 }

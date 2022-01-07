@@ -8,6 +8,7 @@ import net.minecraft.pentahack.settings.NumberSetting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.input.Keyboard;
 
 import java.util.Comparator;
@@ -17,71 +18,26 @@ import java.util.stream.Collectors;
 public class AimBotModule extends Module {
 
     public NumberSetting range = new NumberSetting("Range", 4, 1, 6);
-    public BooleanSetting hidden = new BooleanSetting("Hidden", false);
-
 
     public AimBotModule() {
-        super("AimBot", Keyboard.KEY_U, Category.COMBAT);
-        this.addSettings(range, hidden);
+        super("AimBot", Keyboard.KEY_NONE, Category.COMBAT);
+        this.addSettings(range);
     }
 
     public static Minecraft mc = Minecraft.getMinecraft();
 
+    @Override
     public void onEnable() {
 
     }
 
+    @Override
     public void onDisable() {
 
     }
 
-    public static float[] rotations(Entity e) {
-        /*
-        double d0 = entity.posX - mc.player.posX;
-        double d1 = entity.posY - (mc.player.posY + (double) mc.player.getEyeHeight());
-        double d2 = entity.posZ - mc.player.posZ;
-        double d3 = MathHelper.sqrt(d0 * d0 + d2 * d2);
-        float f = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
-        float f1 = (float)(-(MathHelper.atan2(d1, d3) * (180D / Math.PI)))/3;
 
-        return new float[]{f, f1};
-
-
-                          / | \
-                         /  |  \
-                            |
-                            |
-
-        |''\     |'''|  |'''|       |''\     |'''|  |'''|
-        |   |    |   |  |   |       |   |    |   |  |   |
-        |../     |...|  |...|       |../     |...|  |...|
-
-
-
-        */
-
-        double deltaX = e.posX + (e.posX - e.lastTickPosX) - mc.player.posX;
-        double deltaY = e.posY - 3.5 + e.getEyeHeight() - mc.player.posY + mc.player.getEyeHeight();
-        double deltaZ = e.posZ + (e.posZ - e.lastTickPosZ) - mc.player.posZ;
-        double distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaZ, 2));
-
-        float yaw = (float) Math.toDegrees(-Math.atan(deltaX - deltaZ));
-        float pitch = (float) -Math.toDegrees(Math.atan(deltaY / distance));
-
-        if (deltaX < 0 && deltaZ < 0) {
-            yaw = (float) (90 + Math.toDegrees(Math.atan(deltaZ / deltaX)));
-        } else if (deltaX > 0 && deltaZ < 0) {
-            yaw = (float) (-90 + Math.toDegrees(Math.atan(deltaZ / deltaX)));
-        }
-
-        /*
-        yaw += (yaw / 100) * offset;
-        pitch += (pitch / 100) * offset;
-         */
-
-        return new float[]{yaw, pitch};
-    }
-
+    @Override
     public void onEvent(Event e) {
         if (e instanceof EventUpdate) {
             if (e.isPre()) {
@@ -91,10 +47,44 @@ public class AimBotModule extends Module {
                 targets.sort(Comparator.comparingDouble(ent -> ((EntityLivingBase) ent).getDistanceToEntity(mc.player)));
                 targets.stream().filter(EntityLivingBase::isEntityAlive);
                 if (!targets.isEmpty()) {
-                    mc.player.rotationYaw = rotations(targets.get(0))[0];
+                    /*mc.player.rotationYaw = rotations(targets.get(0))[0];
                     mc.player.rotationPitch = rotations(targets.get(0))[1];
+                    */
+                    faceEntity(targets.get(0));
                 }
             }
         }
+    }
+
+    public static synchronized void faceEntity(EntityLivingBase entity) {
+        final float[] rotations = getRotationsNeeded(entity);
+
+        if (rotations != null) {
+            mc.player.rotationYaw = rotations[0];
+            mc.player.rotationPitch = rotations[1] + 1.0F;// 14
+        }
+    }
+
+    public static float[] getRotationsNeeded(Entity entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        final double diffX = entity.posX - mc.player.posX;
+        final double diffZ = entity.posZ - mc.player.posZ;
+        double diffY;
+
+
+        if (entity instanceof EntityLivingBase) {
+            final EntityLivingBase entityLivingBase = (EntityLivingBase) entity;
+            diffY = entityLivingBase.posY + entityLivingBase.getEyeHeight() - (mc.player.posY + mc.player.getEyeHeight());
+        } else {
+            diffY = (entity.boundingBox.minY + entity.boundingBox.maxY) / 2.0D - (mc.player.posY + mc.player.getEyeHeight());
+        }
+
+        final double dist = MathHelper.sqrt(diffX * diffX + diffZ * diffZ);
+        final float yaw = (float) (Math.atan2(diffZ, diffX) * 180.0D / Math.PI) - 90.0F;
+        final float pitch = (float) -(Math.atan2(diffY, dist) * 180.0D / Math.PI);
+        return new float[]{mc.player.rotationYaw + MathHelper.wrapDegrees(yaw - mc.player.rotationYaw), mc.player.rotationPitch + MathHelper.wrapDegrees(pitch - mc.player.rotationPitch)};
     }
 }

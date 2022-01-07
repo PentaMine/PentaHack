@@ -2,57 +2,44 @@ package net.minecraft.pentahack.ui;
 
 import net.minecraft.pentahack.Client;
 import net.minecraft.pentahack.events.listeners.EventRender;
-import net.minecraft.pentahack.modules.Module;
-import net.minecraft.pentahack.settings.BooleanSetting;
-import net.minecraft.pentahack.util.RenderUtils;
+import net.minecraft.pentahack.gui.hud.HudComponent;
+import net.minecraft.pentahack.gui.hud.impl.*;
+import net.minecraft.pentahack.util.Wrapper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.ScaledResolution;
 
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HUD {
 
     public Minecraft mc = Minecraft.getMinecraft();
-    public static boolean enabled = true;
-    public static boolean ttf = false;
+    public boolean enabled = true;
+    public boolean ttf = false;
+    public List<HudComponent> components = new ArrayList<HudComponent>();
 
+    public HUD(){
+        components.add(new WatermarkComponent());
+        components.add(new ModuleArrayComponent());
+        components.add(new CoordinatesComponent());
+        components.add(new FpsComponent());
+        components.add(new YawComponent());
+        components.add(new SpeedComponent());
+    }
 
+    public void render() {
 
-    public void draw() {
-        ScaledResolution sr = new ScaledResolution(mc);
+        Client.onEvent(new EventRender());
 
+        //Wrapper.mfr.drawStringWithShadow("\u00A74 ooga booga", 100, 100, -1);
 
-        FontRenderer fr = mc.fontRendererObj;
-
-
-        if (enabled) {
-            Client.modules.sort(Comparator.comparingInt(m -> mc.fontRendererObj.getStringWidth(((Module) m).name)).reversed());
-
-            fr.drawStringWithShadow(Client.name + " v" + Client.version, 4, 4, 0xffbf2808);
-
-
-            int count = 0;
-            for (Module m : Client.modules) {
-
-
-
-
-                if (m.settings.size() > 0 && (m.settings.get(m.settings.size() - 1) instanceof BooleanSetting) && ((BooleanSetting) m.settings.get(m.settings.size() - 1)).isEnabled()){
-                    continue;
-                }
-
-                if (!m.toggled){
-                    continue;
-                }
-
-
-                fr.drawString(m.name, sr.getScaledWidth() - fr.getStringWidth(m.name) - 4, 4 + count * (fr.FONT_HEIGHT + 6), RenderUtils.getRainbowWave(4, 0.8f, 1, count * 150));
-                count++;
-            }
-
+        if (!enabled){
+            return;
         }
-        EventRender e = new EventRender();
-        Client.onEvent(e);
+
+        for (HudComponent component : components){
+            if (!component.hidden){
+                component.render();
+            }
+        }
     }
 }

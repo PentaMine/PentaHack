@@ -10,26 +10,16 @@ import org.lwjgl.input.Keyboard;
 public class FlightModule extends Module {
     public Minecraft mc = Minecraft.getMinecraft();
 
-
-    public BooleanSetting hidden = new BooleanSetting("Hidden", false);
-
-
     public FlightModule() {
-        super("Flight", Keyboard.KEY_G, Category.MOVEMENT);
-        this.addSettings(hidden);
+        super("Flight", Keyboard.KEY_NONE, Category.MOVEMENT);
     }
 
-    /*
-    public void onEnable(){
-        mc.player.capabilities.isFlying = true;
-        mc.player.capabilities.allowFlying = true;
-    }
-    */
+    @Override
     public void onDisable() {
         mc.player.capabilities.isFlying = false;
-        //mc.player.capabilities.allowFlying = false;
     }
 
+    @Override
     public void onEvent(Event e) {
         if (e instanceof EventUpdate) {
             if (e.isPre()) {

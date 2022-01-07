@@ -8,10 +8,10 @@ public class ModeSetting extends Setting {
     public int index;
     public List<String> modes;
 
-    public ModeSetting(String name, String defauldMode, String... modes) {
+    public ModeSetting(String name, String defaultMode, String... modes) {
         this.name = name;
         this.modes = Arrays.asList(modes);
-        index = this.modes.indexOf(defauldMode);
+        index = this.modes.indexOf(defaultMode);
     }
 
     public String getMode() {

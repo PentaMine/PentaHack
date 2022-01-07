@@ -9,11 +9,13 @@ public abstract class Command {
     public String name, description, syntax;
     public List<String> alaises = new ArrayList<String>();
 
-    public Command(String name, String description, String syntax, String... alaises ) {
+    public Command(String name, String description, String syntax, String... aliases ) {
         this.name = name;
         this.description = description;
         this.syntax = syntax;
-        this.alaises = Arrays.asList(alaises);
+        this.aliases = Arrays.asList(aliases);
+
+
     }
 
     public abstract void onCommand(String[] args, String command);
@@ -42,11 +44,11 @@ public abstract class Command {
         this.syntax = syntax;
     }
 
-    public List<String> getAlaises() {
-        return alaises;
+    public List<String> getAliases() {
+        return aliases;
     }
 
-    public void setAlaises(List<String> alaises) {
-        this.alaises = alaises;
+    public void setAliases(List<String> aliases) {
+        this.aliases = aliases;
     }
 }

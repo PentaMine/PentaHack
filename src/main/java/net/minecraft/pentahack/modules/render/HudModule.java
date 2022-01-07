@@ -1,5 +1,9 @@
 package net.minecraft.pentahack.modules.render;
 
+import net.minecraft.client.gui.GuiChat;
+import net.minecraft.client.gui.GuiIngame;
+import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.pentahack.Client;
 import net.minecraft.pentahack.events.Event;
 import net.minecraft.pentahack.events.listeners.EventRender;
 import net.minecraft.pentahack.modules.Module;
@@ -10,36 +14,32 @@ import org.lwjgl.input.Keyboard;
 public class HudModule extends Module {
 
     public BooleanSetting ttf = new BooleanSetting("ttf", false);
-    public BooleanSetting hidden = new BooleanSetting("Hidden", true);
-
-    public static boolean dd;
 
     public HudModule() {
-        super("HUD", Keyboard.KEY_O, Category.RENDER);
-        this.addSettings(ttf, hidden);
-        toggled = true;
-        onEnable();
+        super("HUD", Keyboard.KEY_NONE, Category.RENDER);
+        this.addSettings(ttf);
+        toggle();
     }
 
-
-
+    @Override
     public void onEnable() {
-        HUD.enabled = false;
-
+        Client.hud.enabled = true;
     }
 
+    @Override
     public void onDisable() {
-        HUD.enabled = true;
+        Client.hud.enabled = false;
     }
 
-
+    @Override
     public void onEvent(Event e) {
-        if (e instanceof EventRender){
-            if (ttf.enabled){
-                HUD.ttf = true;
-            }
-            else {
-                HUD.ttf = false;
+        if (e instanceof EventRender) {
+            Client.hud.ttf = ttf.enabled;
+
+            if (mc.gameSettings.showDebugInfo || !(mc.currentScreen == null) ) {
+                Client.hud.enabled = false;
+            } else {
+                Client.hud.enabled = true;
             }
         }
     }
