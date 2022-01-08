@@ -1,5 +1,10 @@
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
 
-.idea/discord.xml
-.idea/modules.xml
-.idea/vcs.xml
-.idea/workspace.xml
+# gradle
+build
+.gradle
