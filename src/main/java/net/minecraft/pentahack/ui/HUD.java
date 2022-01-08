@@ -30,8 +30,6 @@ public class HUD {
 
         Client.onEvent(new EventRender());
 
-        //Wrapper.mfr.drawStringWithShadow("\u00A74 ooga booga", 100, 100, -1);
-
         if (!enabled){
             return;
         }
