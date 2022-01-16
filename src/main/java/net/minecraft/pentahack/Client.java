@@ -1,6 +1,7 @@
 package net.minecraft.pentahack;
 
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.pentahack.command.CommandManager;
 import net.minecraft.pentahack.events.Event;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Client {
+
     public static String name = "PentaHack", version = "0.1.2 indev";
     public static String[] devs = {"PentaMine"};
     public static CopyOnWriteArrayList<Module> modules = new CopyOnWriteArrayList<Module>();
@@ -142,6 +144,7 @@ public class Client {
         modules.add(new AntiAFKModule());
         modules.add(new AutoRespawnModule());
         modules.add(new HudManagerModule());
-        // modules.add(new ScaffoldModule());
+        modules.add(new ScaffoldModule());
+        modules.add(new SafeWalkModule());
     }
 }
