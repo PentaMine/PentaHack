@@ -34,11 +34,10 @@ public class ScaffoldModule extends Module {
     public Timer timer = new Timer();
 
     public NumberSetting delay = new NumberSetting("delay", 0, 0, 1000);
-    public BooleanSetting eagle = new BooleanSetting("eagle", false);
-
 
     public ScaffoldModule() {
         super("Scaffold", Keyboard.KEY_NONE, Category.WORLD, "places blocks under the player");
+        addSettings(delay);
     }
 
     /**
@@ -63,29 +62,30 @@ public class ScaffoldModule extends Module {
     @Override
     public void onEvent(Event e) {
         if (e instanceof EventMotion && e.isPre()) {
+            if (timer.hasTimeElapsed((long) delay.getValue(), true)) {
+                pitch = ((EventMotion) e).pitch;
+                yaw = ((EventMotion) e).yaw;
 
-            pitch = ((EventMotion) e).pitch;
-            yaw = ((EventMotion) e).yaw;
-
-            if (mc.player.inventory.getCurrentItem().getItem() instanceof ItemBlock && mc.player.fallDistance < 3f && mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
-                if (!placeBlock(new BlockPos(mc.player.posX, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ), true)) {
-                    // failure management
-                    if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
-                        placeBlock(new BlockPos(mc.player.posX - 1, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ), true);
-                    }
-                    if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
-                        placeBlock(new BlockPos(mc.player.posX + 1, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ), true);
-                    }
-                    if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
-                        placeBlock(new BlockPos(mc.player.posX, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ - 1), true);
-                    }
-                    if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
-                        placeBlock(new BlockPos(mc.player.posX, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ + 1), true);
+                if (mc.player.inventory.getCurrentItem().getItem() instanceof ItemBlock && mc.player.fallDistance < 3f && mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
+                    if (!placeBlock(new BlockPos(mc.player.posX, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ), true)) {
+                        // failure management
+                        if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
+                            placeBlock(new BlockPos(mc.player.posX - 1, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ), true);
+                        }
+                        if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
+                            placeBlock(new BlockPos(mc.player.posX + 1, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ), true);
+                        }
+                        if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
+                            placeBlock(new BlockPos(mc.player.posX, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ - 1), true);
+                        }
+                        if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
+                            placeBlock(new BlockPos(mc.player.posX, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ + 1), true);
+                        }
                     }
                 }
+                ((EventMotion) e).setPitch(pitch);
+                ((EventMotion) e).setYaw(yaw);
             }
-            ((EventMotion) e).setPitch(pitch);
-            ((EventMotion) e).setYaw(yaw);
         }
     }
 
@@ -103,6 +103,9 @@ public class ScaffoldModule extends Module {
 
             yaw = varYaw;
             pitch = varPitch;
+
+            mc.player.rotationYaw = yaw;
+            mc.player.rotationPitch = pitch;
 
             return true;
         }
@@ -128,7 +131,6 @@ public class ScaffoldModule extends Module {
         } else {
             currentPos = null;
             currentFacing = null;
-            //Client.addCustomChatMessage(this.name, "failed");
             return false;
         }
         return true;
