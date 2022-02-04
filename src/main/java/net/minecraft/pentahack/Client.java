@@ -61,8 +61,6 @@ public class Client {
             return;
         }
 
-        //addChatMessage("" + mc.debug);
-
         CommandManager commandManager = new CommandManager();
         if (e instanceof EventChat) {
             commandManager.handleChat((EventChat) e);

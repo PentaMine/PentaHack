@@ -45,8 +45,9 @@ public class CoordinatesComponent extends HudComponent {
 
         if (mode.getMode().equalsIgnoreCase("In line")) {
             fr.drawStringWithShadow(message, sr.getScaledWidth() - (fr.getStringWidth(message) + 4), sr.getScaledHeight() - (fr.FONT_HEIGHT + 4), Client.color);
-            setTop(sr.getScaledHeight() - (fr.FONT_HEIGHT + 4));
-            setLeft(sr.getScaledWidth() - (fr.getStringWidth(message) + 4));
+
+            this.setTop(sr.getScaledHeight() - (fr.FONT_HEIGHT + 4));
+            this.setLeft(sr.getScaledWidth() - (fr.getStringWidth(message) + 4));
 
         }
         else {
@@ -58,8 +59,8 @@ public class CoordinatesComponent extends HudComponent {
             fr.drawStringWithShadow(dataX, sr.getScaledWidth() - (fr.getStringWidth(dataX) + 4), sr.getScaledHeight() - ((fr.FONT_HEIGHT * 3) + 4 + 4), Client.color);
             fr.drawStringWithShadow(dataY, sr.getScaledWidth() - (fr.getStringWidth(dataY) + 4), sr.getScaledHeight() - ((fr.FONT_HEIGHT * 2) + 4 + 2), Client.color);
             fr.drawStringWithShadow(dataZ, sr.getScaledWidth() - (fr.getStringWidth(dataZ) + 4), sr.getScaledHeight() - (fr.FONT_HEIGHT + 4), Client.color);
-            setTop(sr.getScaledHeight() - ((fr.FONT_HEIGHT * 3) + 4 + 4));
 
+            this.setTop(sr.getScaledHeight() - ((fr.FONT_HEIGHT * 3) + 4 + 4));
             this.setLeft(Math.min(Math.min(x1,x2), x3));
         }
 

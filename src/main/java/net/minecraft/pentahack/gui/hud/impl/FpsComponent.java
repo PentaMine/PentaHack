@@ -23,5 +23,9 @@ public class FpsComponent extends HudComponent {
         List<String> info = new ArrayList<String>(Arrays.asList(mc.debug.split(" ")));
 
         fr.drawStringWithShadow("FPS: " + info.get(0), 4, 100, Client.color);
+        this.setRight(fr.getStringWidth("FPS: " + info.get(0)) + 4);
+        this.setLeft(4);
+        this.setTop(100 + fr.FONT_HEIGHT);
+        this.setBottom(100);
     }
 }

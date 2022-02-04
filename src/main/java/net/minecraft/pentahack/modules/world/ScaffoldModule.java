@@ -1,9 +1,9 @@
 package net.minecraft.pentahack.modules.world;
 
 import net.minecraft.block.BlockAir;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.pentahack.Client;
 import net.minecraft.pentahack.events.Event;
 import net.minecraft.pentahack.events.listeners.EventMotion;
 import net.minecraft.pentahack.modules.Module;
@@ -17,9 +17,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.input.Keyboard;
 
-import javax.swing.text.StyledEditorKit;
-import java.sql.Time;
-
 public class ScaffoldModule extends Module {
 
     /**
@@ -28,16 +25,19 @@ public class ScaffoldModule extends Module {
 
     private BlockPos currentPos;
     private EnumFacing currentFacing;
-    private boolean rotated = false;
     public float yaw;
     public float pitch;
+    public float prevYaw;
+    public float prevPitch;
     public Timer timer = new Timer();
+    public Timer timer2 = new Timer();
 
     public NumberSetting delay = new NumberSetting("delay", 0, 0, 1000);
+    public BooleanSetting test = new BooleanSetting("test", false);
 
     public ScaffoldModule() {
         super("Scaffold", Keyboard.KEY_NONE, Category.WORLD, "places blocks under the player");
-        addSettings(delay);
+        addSettings(delay, test);
     }
 
     /**
@@ -62,50 +62,77 @@ public class ScaffoldModule extends Module {
     @Override
     public void onEvent(Event e) {
         if (e instanceof EventMotion && e.isPre()) {
-            if (timer.hasTimeElapsed((long) delay.getValue(), true)) {
+
+            isPlayerOnEdge(mc.player);
+
+            if (timer.hasTimeElapsed((long) delay.getValue(), true)  && isPlayerOnEdge(mc.player)) {
+
                 pitch = ((EventMotion) e).pitch;
                 yaw = ((EventMotion) e).yaw;
 
-                if (mc.player.inventory.getCurrentItem().getItem() instanceof ItemBlock && mc.player.fallDistance < 3f && mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
-                    if (!placeBlock(new BlockPos(mc.player.posX, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ), true)) {
+                if (mc.player.inventory.getCurrentItem().getItem() instanceof ItemBlock && mc.player.fallDistance < 3f) {
+                    if (!placeBlock(new BlockPos(mc.player.posX, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ), true, (EventMotion) e)) {
                         // failure management
                         if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
-                            placeBlock(new BlockPos(mc.player.posX - 1, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ), true);
+                            placeBlock(new BlockPos(mc.player.posX - 1, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ), true, (EventMotion) e);
                         }
                         if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
-                            placeBlock(new BlockPos(mc.player.posX + 1, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ), true);
+                            placeBlock(new BlockPos(mc.player.posX + 1, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ), true, (EventMotion) e);
                         }
                         if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
-                            placeBlock(new BlockPos(mc.player.posX, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ - 1), true);
+                            placeBlock(new BlockPos(mc.player.posX, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ - 1), true, (EventMotion) e);
                         }
                         if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
-                            placeBlock(new BlockPos(mc.player.posX, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ + 1), true);
+                            placeBlock(new BlockPos(mc.player.posX, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ + 1), true, (EventMotion) e);
                         }
                     }
                 }
-                ((EventMotion) e).setPitch(pitch);
-                ((EventMotion) e).setYaw(yaw);
+
+                if (test.isEnabled()){
+                    mc.player.rotationPitch = pitch;
+                    mc.player.rotationYaw = yaw;
+                }
             }
+
+            if (!timer2.hasTimeElapsed(5000, true)){
+                pitch = prevPitch;
+                yaw = prevYaw;
+                //Client.addCustomChatMessage(this.name, "set");
+
+            }
+            ((EventMotion) e).setPitch(pitch);
+            ((EventMotion) e).setYaw(yaw);
         }
     }
 
-    public boolean placeBlock(BlockPos pos, boolean swing) {
-        if (setBlockAndFacing(pos)) {
-            mc.playerController.processRightClickBlock(mc.player, mc.world, pos, currentFacing, new Vec3d(currentPos.getX(), currentPos.getY(), currentPos.getZ()), EnumHand.MAIN_HAND);
-            if (swing) {
-                mc.player.swingArm(EnumHand.MAIN_HAND);
-            }
+    public boolean placeBlock(BlockPos pos, boolean swing, EventMotion event) {
+        if (!(event instanceof EventMotion)){
+            return false;
+        }
 
+        if (setBlockAndFacing(pos)) {
             float[] facing = BlockUtil.getDirectionToBlock(currentPos.getX(), currentPos.getY(), currentPos.getZ(), currentFacing);
 
-            float varYaw = facing[0];
-            float varPitch = facing[1] + 90;
+            float varYaw = (float) getTheta(mc.player.motionX, mc.player.motionZ);
+            float varPitch = facing[1] + 86.0f;
 
             yaw = varYaw;
             pitch = varPitch;
 
-            mc.player.rotationYaw = yaw;
-            mc.player.rotationPitch = pitch;
+            prevPitch = varPitch;
+            prevYaw = varYaw;
+
+            ((EventMotion) event).setPitch(pitch);
+            ((EventMotion) event).setYaw(yaw);
+
+            mc.playerController.processRightClickBlock(mc.player, mc.world, pos, currentFacing, new Vec3d(currentPos.getX(), currentPos.getY(), currentPos.getZ()), EnumHand.MAIN_HAND);
+
+            if (swing) {
+                mc.player.swingArm(EnumHand.MAIN_HAND);
+            }
+
+            timer2.reset();
+
 
             return true;
         }
@@ -136,4 +163,38 @@ public class ScaffoldModule extends Module {
         return true;
     }
 
+    public boolean isPlayerOnEdge(EntityPlayer playerIn){
+
+        double varZ = Math.abs(playerIn.posZ - (int) playerIn.posZ);
+        double varX = Math.abs(playerIn.posX - (int) playerIn.posX);
+
+        if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir){
+            if (mc.player.getHorizontalFacing().equals(EnumFacing.WEST) || mc.player.getHorizontalFacing().equals(EnumFacing.EAST)){
+                if ((varX > .100 && varX < .5) || (varX < .900 && varX > .5)){
+                    return true;
+                }
+            }
+            if (mc.player.getHorizontalFacing().equals(EnumFacing.NORTH) || mc.player.getHorizontalFacing().equals(EnumFacing.SOUTH)){
+                if ((varZ > .100 && varZ < .5) || (varZ < .900 && varZ > .5)){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public double getTheta(double x, double y) {
+        double theta = StrictMath.toDegrees(StrictMath.atan2(y, x));
+        if ((theta < -360.0D) || (theta > 360.0D)) {
+            theta %= 360.0D;
+        }
+        if (theta < 0.0D) {
+            theta += 360.0D;
+        }
+
+        theta = theta + 90;
+
+        return theta;
+    }
 }

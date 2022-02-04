@@ -34,6 +34,6 @@ public class YawComponent extends HudComponent {
             message = rotationYaw + " " + rotationPitch;
         }
 
-        fr.drawStringWithShadow(message, sr.getScaledWidth() - 4 - fr.getStringWidth(message), (float) (Client.hud.components.get(2).top - 11), Client.color);
+        fr.drawStringWithShadow(message, sr.getScaledWidth() - 4 - fr.getStringWidth(message), (float) Client.hud.components.get(2).getTop() - fr.FONT_HEIGHT - 2, Client.color);
     }
 }

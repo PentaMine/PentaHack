@@ -1,6 +1,5 @@
 package net.minecraft.pentahack.modules;
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import net.minecraft.pentahack.Client;
 import net.minecraft.pentahack.events.Event;
 import net.minecraft.pentahack.settings.Setting;
@@ -41,7 +40,7 @@ public class Module {
         this.settings.addAll(Arrays.asList(settings));
     }
 
-    public boolean IsEnabled() {
+    public boolean isEnabled() {
         return toggled;
     }
 
@@ -91,24 +90,6 @@ public class Module {
             this.x = x;
             this.y = y;
             this.expanded = expanded;
-        }
-
-        public static List<Module> getModulesByCategory(String name) {
-
-            name = name.toLowerCase();
-            name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-
-            List<Module> modules = new ArrayList<>(Collections.emptyList());
-            for (Category c : Module.Category.values()) {
-                if (c.name.equals(name)) {
-                    for (Module m : Client.modules) {
-                        if (m.category == c) {
-                            modules.add(m);
-                        }
-                    }
-                }
-            }
-            return modules;
         }
     }
 }

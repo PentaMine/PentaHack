@@ -4,7 +4,6 @@ import net.minecraft.pentahack.Client;
 import net.minecraft.pentahack.events.listeners.EventRender;
 import net.minecraft.pentahack.gui.hud.HudComponent;
 import net.minecraft.pentahack.gui.hud.impl.*;
-import net.minecraft.pentahack.util.Wrapper;
 import net.minecraft.client.Minecraft;
 
 import java.util.ArrayList;
