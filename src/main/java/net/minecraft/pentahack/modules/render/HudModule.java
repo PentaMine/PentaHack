@@ -1,14 +1,10 @@
 package net.minecraft.pentahack.modules.render;
 
-import net.minecraft.client.gui.GuiChat;
-import net.minecraft.client.gui.GuiIngame;
-import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.pentahack.Client;
 import net.minecraft.pentahack.events.Event;
 import net.minecraft.pentahack.events.listeners.EventRender;
 import net.minecraft.pentahack.modules.Module;
 import net.minecraft.pentahack.settings.BooleanSetting;
-import net.minecraft.pentahack.ui.HUD;
 import org.lwjgl.input.Keyboard;
 
 public class HudModule extends Module {

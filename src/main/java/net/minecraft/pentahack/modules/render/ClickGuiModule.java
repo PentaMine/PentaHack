@@ -8,7 +8,6 @@ import net.minecraft.pentahack.modules.Module;
 import net.minecraft.pentahack.settings.KeyBindSetting;
 import net.minecraft.pentahack.settings.Setting;
 import net.minecraft.pentahack.ui.ClickGuiHandler;
-import net.minecraft.pentahack.ui.HUD;
 import org.lwjgl.input.Keyboard;
 
 public class ClickGuiModule extends Module {

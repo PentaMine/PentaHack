@@ -1,10 +1,8 @@
 package net.minecraft.pentahack.modules.movement;
 
 import net.minecraft.block.BlockAir;
-import net.minecraft.pentahack.Client;
 import net.minecraft.pentahack.events.Event;
 import net.minecraft.pentahack.events.listeners.EventMotion;
-import net.minecraft.pentahack.events.listeners.EventUpdate;
 import net.minecraft.pentahack.modules.Module;
 import net.minecraft.util.math.BlockPos;
 import org.lwjgl.input.Keyboard;

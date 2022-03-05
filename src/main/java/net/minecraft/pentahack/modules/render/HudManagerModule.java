@@ -4,7 +4,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.pentahack.events.Event;
 import net.minecraft.pentahack.events.listeners.EventRender;
 import net.minecraft.pentahack.modules.Module;
-import net.minecraft.pentahack.ui.ClickGuiHandler;
 import net.minecraft.pentahack.ui.GuiHudManager;
 import org.lwjgl.input.Keyboard;
 

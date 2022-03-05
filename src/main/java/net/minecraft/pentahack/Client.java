@@ -1,7 +1,6 @@
 package net.minecraft.pentahack;
 
 
-import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.pentahack.command.CommandManager;
 import net.minecraft.pentahack.events.Event;

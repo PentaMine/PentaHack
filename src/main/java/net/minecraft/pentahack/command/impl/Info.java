@@ -2,8 +2,6 @@ package net.minecraft.pentahack.command.impl;
 
 import net.minecraft.pentahack.Client;
 import net.minecraft.pentahack.command.Command;
-import net.minecraft.pentahack.modules.Module;
-import org.lwjgl.input.Keyboard;
 
 import java.util.Arrays;
 

@@ -1,19 +1,20 @@
 package net.minecraft.pentahack.modules.combat;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.pentahack.events.Event;
 import net.minecraft.pentahack.events.listeners.EventUpdate;
 import net.minecraft.pentahack.modules.Module;
-import net.minecraft.pentahack.settings.BooleanSetting;
 import net.minecraft.pentahack.settings.NumberSetting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.input.Keyboard;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
+;
 
 public class AimBotModule extends Module {
 

@@ -3,7 +3,6 @@ package net.minecraft.pentahack.modules.movement;
 import net.minecraft.pentahack.events.Event;
 import net.minecraft.pentahack.events.listeners.EventUpdate;
 import net.minecraft.pentahack.modules.Module;
-import net.minecraft.pentahack.settings.BooleanSetting;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
 

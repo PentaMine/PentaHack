@@ -1,7 +1,6 @@
 package net.minecraft.pentahack.modules.render;
 
 import net.minecraft.pentahack.modules.Module;
-import net.minecraft.pentahack.settings.BooleanSetting;
 import org.lwjgl.input.Keyboard;
 
 public class FullBrightModule extends Module {
