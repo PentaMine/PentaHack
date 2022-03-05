@@ -70,7 +70,7 @@ public class ScaffoldModule extends Module {
                 pitch = ((EventMotion) e).pitch;
                 yaw = ((EventMotion) e).yaw;
 
-                if (mc.player.inventory.getCurrentItem().getItem() instanceof ItemBlock && mc.player.fallDistance < 3f) {
+                if (mc.player.inventory.getCurrentItem().getItem() instanceof ItemBlock /*&& /*mc.player.fallDistance < 3f*/) {
                     if (!placeBlock(new BlockPos(mc.player.posX, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ), true, (EventMotion) e)) {
                         // failure management
                         if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
@@ -170,12 +170,12 @@ public class ScaffoldModule extends Module {
 
         if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir){
             if (mc.player.getHorizontalFacing().equals(EnumFacing.WEST) || mc.player.getHorizontalFacing().equals(EnumFacing.EAST)){
-                if ((varX > .100 && varX < .5) || (varX < .900 && varX > .5)){
+                if ((varX > .030 && varX < .5) || (varX < .970 && varX > .5)){
                     return true;
                 }
             }
             if (mc.player.getHorizontalFacing().equals(EnumFacing.NORTH) || mc.player.getHorizontalFacing().equals(EnumFacing.SOUTH)){
-                if ((varZ > .100 && varZ < .5) || (varZ < .900 && varZ > .5)){
+                if ((varZ > .030 && varZ < .5) || (varZ < .970 && varZ > .5)){
                     return true;
                 }
             }
