@@ -56,7 +56,7 @@ public class Client {
     }
 
     public static void onEvent(Event e) {
-        if (Minecraft.getMinecraft().player == null && Minecraft.getMinecraft().world == null) {
+        if (Minecraft.getMinecraft().player == null || Minecraft.getMinecraft().world == null) {
             return;
         }
 
