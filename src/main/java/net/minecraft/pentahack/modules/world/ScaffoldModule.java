@@ -1,9 +1,13 @@
 package net.minecraft.pentahack.modules.world;
 
 import net.minecraft.block.BlockAir;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.pentahack.Client;
 import net.minecraft.pentahack.events.Event;
 import net.minecraft.pentahack.events.listeners.EventMotion;
 import net.minecraft.pentahack.modules.Module;
@@ -11,10 +15,12 @@ import net.minecraft.pentahack.settings.BooleanSetting;
 import net.minecraft.pentahack.settings.NumberSetting;
 import net.minecraft.pentahack.util.BlockUtil;
 import net.minecraft.pentahack.util.Timer;
+import net.minecraft.pentahack.util.render.RenderUtils;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
 public class ScaffoldModule extends Module {
@@ -33,11 +39,13 @@ public class ScaffoldModule extends Module {
     public Timer timer2 = new Timer();
 
     public NumberSetting delay = new NumberSetting("delay", 0, 0, 1000);
+    public BooleanSetting display = new BooleanSetting("display block number", true);
     public BooleanSetting test = new BooleanSetting("test", false);
+
 
     public ScaffoldModule() {
         super("Scaffold", Keyboard.KEY_NONE, Category.WORLD, "places blocks under the player");
-        addSettings(delay, test);
+        addSettings(delay, display, test);
     }
 
     /**
@@ -61,16 +69,23 @@ public class ScaffoldModule extends Module {
      */
     @Override
     public void onEvent(Event e) {
+
+        if (display.enabled){
+            drawScreen();
+        }
+
+        findBlockToPlaceOn(new BlockPos(mc.player.posX, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ));
+
         if (e instanceof EventMotion && e.isPre()) {
 
             isPlayerOnEdge(mc.player);
 
-            if (timer.hasTimeElapsed((long) delay.getValue(), true)  && isPlayerOnEdge(mc.player)) {
+            if (timer.hasTimeElapsed((long) delay.getValue(), true) && isPlayerOnEdge(mc.player)) {
 
                 pitch = ((EventMotion) e).pitch;
                 yaw = ((EventMotion) e).yaw;
 
-                if (mc.player.inventory.getCurrentItem().getItem() instanceof ItemBlock /*&& /*mc.player.fallDistance < 3f*/) {
+                if (mc.player.inventory.getCurrentItem().getItem() instanceof ItemBlock && mc.player.fallDistance <= 3f) {
                     if (!placeBlock(new BlockPos(mc.player.posX, mc.player.posY - 1 - mc.player.fallDistance, mc.player.posZ), true, (EventMotion) e)) {
                         // failure management
                         if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
@@ -88,29 +103,31 @@ public class ScaffoldModule extends Module {
                     }
                 }
 
-                if (test.isEnabled()){
+                if (test.isEnabled()) {
                     mc.player.rotationPitch = pitch;
                     mc.player.rotationYaw = yaw;
                 }
             }
 
-            if (!timer2.hasTimeElapsed(5000, true)){
+            if (!timer2.hasTimeElapsed(5000, true)) {
                 pitch = prevPitch;
                 yaw = prevYaw;
                 //Client.addCustomChatMessage(this.name, "set");
 
             }
+
             ((EventMotion) e).setPitch(pitch);
             ((EventMotion) e).setYaw(yaw);
+
         }
     }
 
     public boolean placeBlock(BlockPos pos, boolean swing, EventMotion event) {
-        if (!(event instanceof EventMotion)){
+        if (event == null) {
             return false;
         }
 
-        if (setBlockAndFacing(pos)) {
+        if (setBlockAndFacing(findBlockToPlaceOn(pos))) {
             float[] facing = BlockUtil.getDirectionToBlock(currentPos.getX(), currentPos.getY(), currentPos.getZ(), currentFacing);
 
             float varYaw = (float) getTheta(mc.player.motionX, mc.player.motionZ);
@@ -140,6 +157,11 @@ public class ScaffoldModule extends Module {
     }
 
     public boolean setBlockAndFacing(BlockPos var1) {
+
+        if (var1 == null){
+            return false;
+        }
+
         if (mc.world.getBlockState(var1.add(0, -1, 0)).getBlock() != Blocks.AIR) {
             this.currentPos = var1.add(0, -1, 0);
             currentFacing = EnumFacing.UP;
@@ -163,21 +185,17 @@ public class ScaffoldModule extends Module {
         return true;
     }
 
-    public boolean isPlayerOnEdge(EntityPlayer playerIn){
+    public boolean isPlayerOnEdge(EntityPlayer playerIn) {
 
         double varZ = Math.abs(playerIn.posZ - (int) playerIn.posZ);
         double varX = Math.abs(playerIn.posX - (int) playerIn.posX);
 
-        if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir){
-            if (mc.player.getHorizontalFacing().equals(EnumFacing.WEST) || mc.player.getHorizontalFacing().equals(EnumFacing.EAST)){
-                if ((varX > .030 && varX < .5) || (varX < .970 && varX > .5)){
-                    return true;
-                }
+        if (mc.world.getBlockState(new BlockPos(mc.player.posX, mc.player.posY - 1, mc.player.posZ)).getBlock() instanceof BlockAir) {
+            if (mc.player.getHorizontalFacing().equals(EnumFacing.WEST) || mc.player.getHorizontalFacing().equals(EnumFacing.EAST)) {
+                return (varX > .030 && varX < .5) || (varX < .970 && varX > .5);
             }
-            if (mc.player.getHorizontalFacing().equals(EnumFacing.NORTH) || mc.player.getHorizontalFacing().equals(EnumFacing.SOUTH)){
-                if ((varZ > .030 && varZ < .5) || (varZ < .970 && varZ > .5)){
-                    return true;
-                }
+            if (mc.player.getHorizontalFacing().equals(EnumFacing.NORTH) || mc.player.getHorizontalFacing().equals(EnumFacing.SOUTH)) {
+                return (varZ > .030 && varZ < .5) || (varZ < .970 && varZ > .5);
             }
         }
 
@@ -196,5 +214,42 @@ public class ScaffoldModule extends Module {
         theta = theta + 90;
 
         return theta;
+    }
+
+    public int getNumberOfBlocksInInventory() {
+        int number = 0;
+        for (ItemStack item : mc.player.inventory.mainInventory) {
+            if (item.getItem() instanceof ItemBlock){
+                number += item.stackSize;
+            }
+        }
+
+        return number;
+    }
+
+    public void drawScreen(){
+        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+
+        RenderUtils.drawRect((double) sr.getScaledWidth() / 2, (double) sr.getScaledHeight() / 2, Client.fr.getStringWidth(String.valueOf(getNumberOfBlocksInInventory())) + 10, Client.fr.FONT_HEIGHT + 4, Client.color);
+        Client.fr.drawString(String.valueOf(getNumberOfBlocksInInventory()), (float) sr.getScaledWidth() / 2 + 5, (float) sr.getScaledHeight() / 2 + 2, -1);
+    }
+
+    public BlockPos findBlockToPlaceOn(BlockPos pos){
+
+        BlockPos pos1 = pos.add(1, 0, 0);
+        BlockPos pos2 = pos.add(-1, 0, 0);
+        BlockPos pos3 = pos.add(0, 0, 1);
+        BlockPos pos4 = pos.add(0, 0, -1);
+        BlockPos pos5 = pos.add(0, -1, 0);
+
+        BlockPos[] posList = new BlockPos[]{pos1, pos2, pos3, pos4, pos5};
+
+        for (BlockPos pos6 : posList){
+            if (!(mc.world.getBlockState(pos6).getBlock() instanceof BlockAir)){
+                return pos6;
+            }
+        }
+
+        return null;
     }
 }

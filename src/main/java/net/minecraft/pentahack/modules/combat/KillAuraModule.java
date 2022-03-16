@@ -20,16 +20,16 @@ public class KillAuraModule extends Module {
     public static Minecraft mc = Minecraft.getMinecraft();
     public Timer timer = new Timer();
 
-
-    //public BooleanSetting clientAim = new BooleanSetting("ClientAim", false);
     public ModeSetting aim = new ModeSetting("aim", "Packet", "Packet", "Client", "None");
     public BooleanSetting noSwing = new BooleanSetting("NoSwing", false);
     public NumberSetting range = new NumberSetting("Range", 4, 1, 6);
     public BooleanSetting multiShot = new BooleanSetting("MultiShot", false);
+    public BooleanSetting bypass = new BooleanSetting("Bypass", true);
+    public NumberSetting delayAfterDamage = new NumberSetting("DelayAfterDamage", 10, 5, 15);
 
     public KillAuraModule() {
         super("KillAura", Keyboard.KEY_NONE, Category.COMBAT);
-        this.addSettings(aim, noSwing, range, multiShot);
+        this.addSettings(aim, noSwing, range, multiShot, bypass, delayAfterDamage);
     }
 
     @Override
@@ -64,6 +64,10 @@ public class KillAuraModule extends Module {
                 //use code above for filtering entities
 
                 if (!targets.isEmpty()) {
+
+                    if (bypass.enabled && !(mc.player.ticksExisted - mc.player.getLastAttackerTime() >= delayAfterDamage.value)){
+                        return;
+                    }
 
                     EntityLivingBase target = targets.get(0);
 

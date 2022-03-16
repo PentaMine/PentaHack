@@ -2,24 +2,6 @@ package net.minecraft.pentahack.util.render;
 
 // Credit: https://github.com/HyperiumClient/Hyperium/blob/mcgradle/src/main/java/cc/hyperium/utils/HyperiumFontRenderer.java
 
-/*
- *       Copyright (C) 2018-present Hyperium <https://hyperium.cc/>
- *
- *       This program is free software: you can redistribute it and/or modify
- *       it under the terms of the GNU Lesser General Public License as published
- *       by the Free Software Foundation, either version 3 of the License, or
- *       (at your option) any later version.
- *
- *       This program is distributed in the hope that it will be useful,
- *       but WITHOUT ANY WARRANTY; without even the implied warranty of
- *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *       GNU Lesser General Public License for more details.
- *
- *       You should have received a copy of the GNU Lesser General Public License
- *       along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.io.IOException;
@@ -38,7 +20,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.UnicodeFont;
 import org.newdawn.slick.font.effects.ColorEffect;
 
-public class PentaFontRenderer{
+public class PentaFontRenderer {
 
     private static final Pattern COLOR_CODE_PATTERN = Pattern.compile("§[0123456789abcdefklmnor]");
     public final int FONT_HEIGHT = 9;
@@ -89,7 +71,7 @@ public class PentaFontRenderer{
             return getFontFromInput("/assets/PentaHack/fonts/SegoeUI-Light.ttf");
         } else if (name.equalsIgnoreCase("raleway")) {
             return getFontFromInput("/assets/PentaHack/fonts/Raleway-SemiBold.ttf");
-        }else if (name.equalsIgnoreCase("yantramanav")) {
+        } else if (name.equalsIgnoreCase("yantramanav")) {
             return getFontFromInput("/assets/PentaHack/fonts/Yantramanav-Light.ttf");
         } else {
             // Need to return the default font.
@@ -214,8 +196,7 @@ public class PentaFontRenderer{
         return lines;
     }
 
-    public float getCharWidth(char c)
-    {
+    public float getCharWidth(char c) {
         return unicodeFont.getWidth(String.valueOf(c));
     }
 }
