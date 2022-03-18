@@ -1,5 +1,6 @@
 package net.minecraft.pentahack.ui;
 
+import io.netty.handler.codec.http.HttpClientUpgradeHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -126,7 +127,7 @@ public class ClickGuiHandler extends GuiScreen {
                             settingCount++;
                             settingCountId++;
                             int id3 = Integer.parseInt(id2 + String.valueOf(settingCountId));
-                            GuiButton button3 = new GuiButton(id3, (int) menuComponent.x, (int) (menuComponent.y + (index * menuComponent.height) + (menuComponent.height * settingCount)) + 2, (int) menuComponent.width, (int) menuComponent.height, sound, setting instanceof NumberSetting ? "num" : setting.name);
+                            GuiButton button3 = new GuiButton(id3, (int) menuComponent.x, (int) (menuComponent.y + (index * menuComponent.height) + (menuComponent.height * settingCount)) + 2, (int) menuComponent.width, (int) menuComponent.height, sound, setting instanceof NumberSetting ? "n" + setting.name : setting.name);
                             button3.setRender(false);
                             this.buttonList.add(button3);
 
@@ -174,6 +175,7 @@ public class ClickGuiHandler extends GuiScreen {
                                     double dif = (((NumberSetting) setting).maximum - ((NumberSetting) setting).minimum + .05) / 100;
 
                                     ((NumberSetting) setting).setValue(((NumberSetting) setting).minimum + dif * posDif);
+
                                 } else if (setting instanceof ModeSetting) {
                                     ((ModeSetting) setting).cycle();
                                 } else if (setting instanceof BooleanSetting) {
@@ -229,15 +231,12 @@ public class ClickGuiHandler extends GuiScreen {
 
         if (clickedMouseButton == 0) {
             for (GuiButton b : buttonList) {
-                if (mouseX >= b.xPosition && mouseY >= b.yPosition && mouseX < b.xPosition + b.getButtonWidth() && mouseY < b.yPosition + b.getButtonHeight() && String.valueOf(b.id).length() == 3) {
-
+                if (mouseX >= b.xPosition && mouseY >= b.yPosition && mouseX < b.xPosition + b.getButtonWidth() && mouseY < b.yPosition + b.getButtonHeight() && String.valueOf(b.id).length() > 2) {
                     for (Module m : Client.modules) {
-                        if (getButtonByName(m.name).id != Integer.parseInt(String.valueOf(b.id).replaceAll(".$", ""))) {
-                            continue;
-                        }
                         for (Setting s : m.settings) {
-                            if (b.displayString.equals("num")) {
+                            if (b.displayString.charAt(0) == 'n' && s.name.equals(b.displayString.substring(1)) && getButtonById(Integer.parseInt(String.valueOf(b.id).substring(0, 2))).displayString.equals(m.name)) {
                                 if (s instanceof NumberSetting) {
+
                                     double posDif = Math.abs(mouseXPos - b.xPosition);
 
                                     double dif = (((NumberSetting) s).maximum - ((NumberSetting) s).minimum + .05) / 100;
@@ -281,6 +280,14 @@ public class ClickGuiHandler extends GuiScreen {
     public GuiButton getButtonByName(String name) {
         for (GuiButton button : this.buttonList) {
             if (button.displayString.equals(name)) {
+                return button;
+            }
+        }
+        return null;
+    }
+    public GuiButton getButtonById(int id) {
+        for (GuiButton button : this.buttonList) {
+            if (button.id == id) {
                 return button;
             }
         }

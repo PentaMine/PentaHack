@@ -16,10 +16,7 @@ import net.minecraft.pentahack.modules.misc.DDosModule;
 import net.minecraft.pentahack.modules.movement.FlightModule;
 import net.minecraft.pentahack.modules.movement.SafeWalkModule;
 import net.minecraft.pentahack.modules.movement.SprintModule;
-import net.minecraft.pentahack.modules.player.AntiAFKModule;
-import net.minecraft.pentahack.modules.player.AntiDropModule;
-import net.minecraft.pentahack.modules.player.AutoRespawnModule;
-import net.minecraft.pentahack.modules.player.NoFallModule;
+import net.minecraft.pentahack.modules.player.*;
 import net.minecraft.pentahack.modules.render.*;
 import net.minecraft.pentahack.modules.world.ScaffoldModule;
 import net.minecraft.pentahack.settings.BooleanSetting;
@@ -104,14 +101,14 @@ public class Client {
         return modules;
     }
 
-    public static void addChatMessage(String message) {
+    public static void addChatMessage(Object message) {
         addCustomChatMessage(name, message);
     }
 
-    public static void addCustomChatMessage(String name, String message) {
+    public static void addCustomChatMessage(String name, Object message) {
         message = "\u00A74" + String.format("[%s]", name) + "\u00A77" + " " + message;
 
-        Minecraft.getMinecraft().player.addChatMessage(new TextComponentString(message));
+        Minecraft.getMinecraft().player.addChatMessage(new TextComponentString(String.valueOf(message)));
 
     }
 
@@ -152,6 +149,7 @@ public class Client {
         modules.add(new ScaffoldModule());
         modules.add(new SafeWalkModule());
         modules.add(new DDosModule());
+        modules.add(new InfinityJumpModule());
     }
 
     public static void initProperties(){
