@@ -1,11 +1,9 @@
 package net.minecraft.pentahack.modules.misc;
 
-import com.mojang.realmsclient.dto.PingResult;
 import net.minecraft.network.status.client.CPacketPing;
 import net.minecraft.pentahack.events.Event;
 import net.minecraft.pentahack.events.listeners.EventUpdate;
 import net.minecraft.pentahack.modules.Module;
-
 import net.minecraft.pentahack.settings.NumberSetting;
 import net.minecraft.pentahack.util.Timer;
 import org.lwjgl.input.Keyboard;

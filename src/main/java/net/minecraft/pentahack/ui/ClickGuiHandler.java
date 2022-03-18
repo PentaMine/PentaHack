@@ -1,6 +1,5 @@
 package net.minecraft.pentahack.ui;
 
-import io.netty.handler.codec.http.HttpClientUpgradeHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
