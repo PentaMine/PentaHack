@@ -70,11 +70,9 @@ public class Client {
     }
 
     public static void onEvent(Event e) {
-        //mc.currentScreen = new GuiPentaMainMenu();
         if (Minecraft.getMinecraft().player == null || Minecraft.getMinecraft().world == null) {
             return;
         }
-        mc.currentScreen = new GuiPentaMainMenu();
         CommandManager commandManager = new CommandManager();
         if (e instanceof EventChat) {
             commandManager.handleChat((EventChat) e);
