@@ -3,6 +3,8 @@ package net.minecraft.pentahack;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.pentahack.command.CommandManager;
 import net.minecraft.pentahack.events.Event;
 import net.minecraft.pentahack.events.listeners.EventChat;
@@ -14,18 +16,26 @@ import net.minecraft.pentahack.modules.combat.FastBowModule;
 import net.minecraft.pentahack.modules.combat.KillAuraModule;
 import net.minecraft.pentahack.modules.misc.DDosModule;
 import net.minecraft.pentahack.modules.movement.FlightModule;
+import net.minecraft.pentahack.modules.movement.InfinityJumpModule;
 import net.minecraft.pentahack.modules.movement.SafeWalkModule;
 import net.minecraft.pentahack.modules.movement.SprintModule;
-import net.minecraft.pentahack.modules.player.*;
+import net.minecraft.pentahack.modules.player.AntiAFKModule;
+import net.minecraft.pentahack.modules.player.AntiDropModule;
+import net.minecraft.pentahack.modules.player.AutoRespawnModule;
+import net.minecraft.pentahack.modules.player.NoFallModule;
 import net.minecraft.pentahack.modules.render.*;
 import net.minecraft.pentahack.modules.world.ScaffoldModule;
 import net.minecraft.pentahack.settings.BooleanSetting;
 import net.minecraft.pentahack.settings.KeyBindSetting;
+import net.minecraft.pentahack.settings.Setting;
+import net.minecraft.pentahack.ui.GuiPentaMainMenu;
 import net.minecraft.pentahack.ui.HUD;
+import net.minecraft.pentahack.util.JsonUtil;
 import net.minecraft.pentahack.util.render.PentaFontRenderer;
 import net.minecraft.util.text.TextComponentString;
 import org.lwjgl.input.Keyboard;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -40,31 +50,31 @@ public class Client {
     public static Minecraft mc = Minecraft.getMinecraft();
     public static PentaFontRenderer fr;
     public static FontRenderer mfr;
+    public static boolean isCustomMenu = false;
 
-    public static void clientInit() {
+    public static void clientInit() throws IOException {
         System.out.println("Starting " + name + " v " + version);
 
         initiateModules();
         initiateGui();
-
-        for (Module module : modules) {
-            module.addSettings(new BooleanSetting("hidden", false));
-            if (module instanceof ClickGuiModule) {
-                module.addSettings(new KeyBindSetting("KeyBind", Keyboard.KEY_LEFT));
-            } else {
-                module.addSettings(new KeyBindSetting("KeyBind", Keyboard.KEY_NONE));
-            }
-        }
+        JsonUtil.readProperties();
+        JsonUtil.readHUDProperties();
 
         fr = new PentaFontRenderer("roboto", 20.0f);
         mfr = mc.fontRendererObj;
     }
 
+    public static void clientShutdown() throws IOException {
+        JsonUtil.saveProperties();
+        JsonUtil.saveHUDProperties();
+    }
+
     public static void onEvent(Event e) {
+        //mc.currentScreen = new GuiPentaMainMenu();
         if (Minecraft.getMinecraft().player == null || Minecraft.getMinecraft().world == null) {
             return;
         }
-
+        mc.currentScreen = new GuiPentaMainMenu();
         CommandManager commandManager = new CommandManager();
         if (e instanceof EventChat) {
             commandManager.handleChat((EventChat) e);
@@ -150,9 +160,40 @@ public class Client {
         modules.add(new SafeWalkModule());
         modules.add(new DDosModule());
         modules.add(new InfinityJumpModule());
+        modules.add(new MainMenuModule());
+
+        for (Module module : Client.modules) {
+            if (module.toggled) {
+                module.onEnable();
+            }
+            module.addSettings(new BooleanSetting("hidden", false));
+            if (module instanceof ClickGuiModule) {
+                module.addSettings(new KeyBindSetting("KeyBind", Keyboard.KEY_LEFT));
+            } else {
+                module.addSettings(new KeyBindSetting("KeyBind", Keyboard.KEY_NONE));
+            }
+        }
     }
 
-    public static void initProperties(){
-        
+    public static Module getModuleByName(String name) {
+        for (Module module : modules) {
+            if (module.name.equals(name)) {
+                return module;
+            }
+        }
+        return null;
+    }
+
+    public static Setting getSettingByName(Module module, String name) {
+        for (Setting s : module.settings) {
+            if (s.name.equals(name)) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    public static GuiScreen getMainMenu(){
+        return isCustomMenu ? new GuiPentaMainMenu() : new GuiMainMenu();
     }
 }

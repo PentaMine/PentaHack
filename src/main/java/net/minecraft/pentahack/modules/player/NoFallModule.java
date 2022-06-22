@@ -27,6 +27,7 @@ public class NoFallModule extends Module {
                     mc.player.fallDistance = (float) Math.random();
                     mc.player.onGround = true;
 
+
                 } else if (mode.getMode().equalsIgnoreCase("FastFall")) {
                     mc.player.posY -= mc.player.fallDistance;
 

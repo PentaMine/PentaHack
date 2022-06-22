@@ -11,11 +11,15 @@ public class ModeSetting extends Setting {
     public ModeSetting(String name, String defaultMode, String... modes) {
         this.name = name;
         this.modes = Arrays.asList(modes);
-        index = this.modes.indexOf(defaultMode);
+        this.index = this.modes.indexOf(defaultMode);
     }
 
     public String getMode() {
         return modes.get(index);
+    }
+
+    public void setMode(String mode) {
+        this.index = !modes.contains(mode) ? this.index : modes.indexOf(mode);
     }
 
     public boolean is(String mode) {

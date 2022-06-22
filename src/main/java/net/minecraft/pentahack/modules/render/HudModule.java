@@ -5,6 +5,8 @@ import net.minecraft.pentahack.events.Event;
 import net.minecraft.pentahack.events.listeners.EventRender;
 import net.minecraft.pentahack.modules.Module;
 import net.minecraft.pentahack.settings.BooleanSetting;
+import net.minecraft.pentahack.ui.ClickGuiHandler;
+import net.minecraft.pentahack.ui.GuiHudManager;
 import org.lwjgl.input.Keyboard;
 
 public class HudModule extends Module {
@@ -32,7 +34,7 @@ public class HudModule extends Module {
         if (e instanceof EventRender) {
             Client.hud.ttf = ttf.enabled;
 
-            if (mc.gameSettings.showDebugInfo || !(mc.currentScreen == null) ) {
+            if (mc.gameSettings.showDebugInfo || (!(mc.currentScreen == null || mc.currentScreen instanceof ClickGuiHandler || mc.currentScreen instanceof GuiHudManager))) {
                 Client.hud.enabled = false;
             } else {
                 Client.hud.enabled = true;

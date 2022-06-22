@@ -81,14 +81,17 @@ public class ClickGuiHandler extends GuiScreen {
                             GlStateManager.scale(1, 1, 1);
 
                             DecimalFormat df2 = new DecimalFormat("#.##");
+
+                            String settingName = Character.toLowerCase(s.name.charAt(0)) + s.name.substring(1);
+
                             if (s instanceof BooleanSetting) {
-                                fr.drawStringWithShadow(s.name + (((BooleanSetting) s).isEnabled() ? " [X]" : " [  ]"), 3, 3, -1);
+                                fr.drawStringWithShadow(settingName + (((BooleanSetting) s).isEnabled() ? " [X]" : " [  ]"), 3, 3, -1);
                             } else if (s instanceof NumberSetting) {
-                                fr.drawStringWithShadow(s.name + ": " + df2.format(((NumberSetting) s).getValue()), 3, 3, -1);
+                                fr.drawStringWithShadow(settingName + ": " + df2.format(((NumberSetting) s).getValue()), 3, 3, -1);
                             } else if (s instanceof ModeSetting) {
-                                fr.drawStringWithShadow(s.name + ": " + ((ModeSetting) s).getMode(), 3, 3, -1);
+                                fr.drawStringWithShadow(settingName + ": " + ((ModeSetting) s).getMode(), 3, 3, -1);
                             } else if (s instanceof KeyBindSetting) {
-                                fr.drawStringWithShadow(((KeyBindSetting) s).pending ? "Press a key" : s.name + ": " + String.valueOf(Keyboard.getKeyName(((KeyBindSetting) s).key)), 3, 3, -1);
+                                fr.drawStringWithShadow(((KeyBindSetting) s).pending ? "Press a key" : settingName + ": " + String.valueOf(Keyboard.getKeyName(((KeyBindSetting) s).key)), 3, 3, -1);
                             }
                             GlStateManager.popMatrix();
                         }
